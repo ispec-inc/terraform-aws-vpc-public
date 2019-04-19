@@ -1,5 +1,9 @@
+locals {
+  vpc_ids = "${aws_vpc.cluster_vpc.*.id}"
+}
+
 output "vpc_id" {
-  value = "${aws_vpc.cluster_vpc.id}"
+  value = "${length(local.vpc_ids) == 0 ? "" : element(concat(local.vpc_ids, list("")), 0)}"
 }
 
 output "public_subnet_1a" {
