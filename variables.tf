@@ -5,3 +5,4 @@ variable "cluster_name" {
 variable "vpc_count" {
   default = 1
 }
+

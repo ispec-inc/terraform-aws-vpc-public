@@ -1,5 +1,5 @@
 resource "aws_vpc" "cluster_vpc" {
-  count = "${var.vpc_count}"
+  count = var.vpc_count
 
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = true
@@ -11,23 +11,24 @@ resource "aws_vpc" "cluster_vpc" {
 }
 
 resource "aws_internet_gateway" "gw" {
-  count  = "${var.vpc_count}"
-  vpc_id = "${aws_vpc.cluster_vpc.id}"
+  count  = var.vpc_count
+  vpc_id = aws_vpc.cluster_vpc[0].id
 
-  tags {
+  tags = {
     Name = "InternetGateway"
   }
 }
 
 resource "aws_route" "internet_access" {
-  count                  = "${var.vpc_count}"
-  route_table_id         = "${aws_vpc.cluster_vpc.main_route_table_id}"
+  count                  = var.vpc_count
+  route_table_id         = aws_vpc.cluster_vpc[0].main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.gw.id}"
+  gateway_id             = aws_internet_gateway.gw[0].id
 }
 
 resource "aws_eip" "vpc_eip" {
-  count      = "${var.vpc_count}"
+  count      = var.vpc_count
   vpc        = true
-  depends_on = ["aws_internet_gateway.gw"]
+  depends_on = [aws_internet_gateway.gw]
 }
+
